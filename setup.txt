@@ -1,0 +1,15 @@
+cd /boot/overlays/
+sudo curl -L -o waveshare35a-overlay.dtb https://github.com/swkim01/waveshare-dtoverlays/blob/master/waveshare35a-overlay.dtb?raw=true
+sudo cp waveshare35a-overlay.dtb waveshare35a.dtbo
+sudo vi /boot/config.txt
+dtparam=spi=on
+dtparam=i2c_arm=on
+hdmi_force_hotplug=1
+hdmi_cvt=480 320 60 1 0 0 0
+hdmi_group=2
+hdmi_mode=87
+
+dtoverlay=waveshare35a,speed=16000000
+
+sudo vi /boot/cmdline.txt | fbcon=map:1 
+sudo apt-get install evtest
