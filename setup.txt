@@ -1,4 +1,4 @@
-sudo vi /boot/config.txt
+cat <<EOT >> /boot/config.txt
 dtparam=spi=on
 dtparam=i2c_arm=on
 hdmi_force_hotplug=1
@@ -7,8 +7,11 @@ hdmi_group=2
 hdmi_mode=87
 
 dtoverlay=piscreen,rotate=90,speed=32000000
+EOT
 
-sudo vi /boot/cmdline.txt | fbcon=map:1 | only if you want to see boot info
-sudo apt-get install evtest
-sudo apt-get install python3-pip
-sudo apt-get install python-pip
+#vi /boot/cmdline.txt | fbcon=map:1 | only if you want to see boot info
+apt-get install python-pip
+pip install wiringpi
+apt-get install tslib libts-bin
+TSLIB_FBDEVICE=/dev/fb1 TSLIB_TSDEVICE=/dev/input/touchscreen ts_calibrate
+#TSLIB_FBDEVICE=/dev/fb1 TSLIB_TSDEVICE=/dev/input/touchscreen ts_test
