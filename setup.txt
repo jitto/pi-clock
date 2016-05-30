@@ -1,6 +1,3 @@
-cd /boot/overlays/
-sudo curl -L -o waveshare35a-overlay.dtb https://github.com/swkim01/waveshare-dtoverlays/blob/master/waveshare35a-overlay.dtb?raw=true
-sudo cp waveshare35a-overlay.dtb waveshare35a.dtbo
 sudo vi /boot/config.txt
 dtparam=spi=on
 dtparam=i2c_arm=on
@@ -9,7 +6,9 @@ hdmi_cvt=480 320 60 1 0 0 0
 hdmi_group=2
 hdmi_mode=87
 
-dtoverlay=waveshare35a,speed=16000000
+dtoverlay=piscreen,rotate=90,speed=32000000
 
-sudo vi /boot/cmdline.txt | fbcon=map:1 
+sudo vi /boot/cmdline.txt | fbcon=map:1 | only if you want to see boot info
 sudo apt-get install evtest
+sudo apt-get install python3-pip
+sudo apt-get install python-pip
