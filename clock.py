@@ -1,4 +1,4 @@
-import scene, pygame, time, pywapi, threading
+import scene, pygame, time, pywapi, threading, sys
 import wiringpi
 
 weather_com_result = None
@@ -9,8 +9,11 @@ wiringpi.pwmWrite(18, 999)
 def updateWeather():
   global weather_com_result
   while True:
-    weather_com_result = pywapi.get_weather_from_weather_com('75056', 'imperial')
-    time.sleep(60)
+    try:
+      weather_com_result = pywapi.get_weather_from_weather_com('75056', 'imperial')
+    except:
+      print("Unexpected error:", sys.exc_info()[0])
+    time.sleep(600)
 
 weatherThread = threading.Thread(target=updateWeather, args=())
 weatherThread.setDaemon(True)
@@ -39,19 +42,38 @@ class TitleScene(scene.SceneBase):
     
     def Update(self):
         if (time.time() - self.brightStart > 5):
-            wiringpi.pwmWrite(18, 100)
+            backLight = 500
+            if (time.localtime().tm_hour > 22 or time.localtime().tm_hour < 5):
+              backLight = 1
+            wiringpi.pwmWrite(18, backLight)
             pygame.mouse.set_visible(False)
-    
+   
+    def Temperature(self, temperature):
+	if (not temperature):
+		return (255, 255, 255)
+	temp = int(temperature)
+	tempColor = (0, 255, 0)
+	if (temp < 50):
+		tempColor = (0, 255, 255)
+	elif (temp > 80):
+		tempColor = (255, 0, 0)
+	return tempColor
+
     def Render(self, screen):
         screen.fill((0, 0, 0))
+        color = (255, 255, 255)
         time_text  = time.strftime('%-I:%M', time.localtime())
-        drawText(time_text, self.font_big, (255,255,255), screen, midright=(478,68))
-        if (type(weather_com_result) is dict and 'current_conditions' in weather_com_result):
-          drawText(weather_com_result['current_conditions']['text'], self.font_med, (255,255,255), screen, center=(240,208))
-          drawText(weather_com_result['current_conditions']['temperature'], self.font_med, (255,255,255), screen, center=(40, 289))
+        drawText(time_text, self.font_big, color, screen, midright=(478,68))
+        weather = weather_com_result
+        if (type(weather) is dict and 'current_conditions' in weather):
+          drawText(weather['current_conditions']['text'], self.font_med, color, screen, center=(240,208))
+	  temp = weather['current_conditions']['temperature'] 
+          drawText(temp, self.font_med, self.Temperature(temp), screen, center=(40, 289))
           x = 129
-          for forecast in weather_com_result['forecasts']:
-            drawText(forecast['high'], self.font_small, (255,255,255), screen, center=(x, 279))
-            drawText(forecast['low'], self.font_small, (255,255,255), screen, center=(x, 302))
-            x = x + 40
+          for forecast in weather['forecasts']:
+		high = forecast['high']
+		drawText(high, self.font_small, self.Temperature(high), screen, center=(x, 279))
+		low = forecast['low']
+		drawText(low, self.font_small, self.Temperature(low), screen, center=(x, 302))
+		x = x + 50
 
