@@ -2,7 +2,7 @@
 Use raspi-config to connect to wifi and boot to console instead of desktop
 
 clone to /home/pi/pi-clock
-run sudo sh setup.txt
+run **sudo sh setup.txt**
 Then add following lines to /etc/rc.local
 
 ```
