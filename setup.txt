@@ -1,25 +1,17 @@
 cat <<EOT >> /boot/config.txt
-dtparam=spi=on
-dtparam=i2c_arm=on
-hdmi_force_hotplug=1
 hdmi_cvt=480 320 60 1 0 0 0
-hdmi_group=2
-hdmi_mode=87
-
-dtoverlay=piscreen,rotate=90,speed=32000000
+dtoverlay=piscreen,rotate=270,speed=32000000
 EOT
 
-cat <<EOT >>  /etc/rc.local
-_IP=$(hostname -I) || true
-if [ "$_IP" ]; then
-  printf "My IP address is %s\n" "$_IP"
-  cd /home/pi/pi-clock && python main.py > /tmp/pi-clock.log 2>&1 &
-fi
-EOT
+sed -i '$icd /home/pi/pi-clock && python main.py > /tmp/pi-clock.log 2>&1 &' rc.local
 
 #vi /boot/cmdline.txt | fbcon=map:1 | only if you want to see boot info
-apt-get install python-pip
 pip install wiringpi
-apt-get install tslib libts-bin
-TSLIB_FBDEVICE=/dev/fb1 TSLIB_TSDEVICE=/dev/input/touchscreen ts_calibrate
+pip install -e git+https://github.com/jtasker/python-weather-api@cf79f478c26dd244e0c90e10d6df91bb4ea8cd5e#egg=pywapi
+
+#apt-get install tslib libts-bin
+#TSLIB_FBDEVICE=/dev/fb1 TSLIB_TSDEVICE=/dev/input/touchscreen ts_calibrate
 #TSLIB_FBDEVICE=/dev/fb1 TSLIB_TSDEVICE=/dev/input/touchscreen ts_test
+
+#todo move tslib as optional by removing touch screen
+#todo move away from wiringpi and pywapi - weather-api
