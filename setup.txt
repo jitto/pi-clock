@@ -9,6 +9,14 @@ hdmi_mode=87
 dtoverlay=piscreen,rotate=90,speed=32000000
 EOT
 
+cat <<EOT >>  /etc/rc.local
+_IP=$(hostname -I) || true
+if [ "$_IP" ]; then
+  printf "My IP address is %s\n" "$_IP"
+  cd /home/pi/pi-clock && python main.py > /tmp/pi-clock.log 2>&1 &
+fi
+EOT
+
 #vi /boot/cmdline.txt | fbcon=map:1 | only if you want to see boot info
 apt-get install python-pip
 pip install wiringpi
